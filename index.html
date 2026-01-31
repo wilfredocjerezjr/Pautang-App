@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#eff6ff">
+    
+    <!-- PWA Settings -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Pautang App">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="description" content="Offline Pautang Management App">
+    
+    <title>Pautang App</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Connect CSS File -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- APP CONTAINER -->
+    <div id="app-root">
+
+    <header>
+        <h1>Pautang App</h1>
+    </header>
+
+    <!-- VIEW 1: HOME -->
+    <div id="view-home" class="view-section active">
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-bar" placeholder="Search Name..." onkeyup="filterHomeList()">
+            <select id="filterSelect" class="filter-select" onchange="filterHomeList()">
+                <option value="all">All</option>
+                <option value="due">Due Soon</option>
+                <option value="overdue">Overdue</option>
+                <option value="paid">Paid</option>
+            </select>
+        </div>
+
+        <div class="section-title">Priority List</div>
+        <div id="homeListContent"></div>
+        
+        <button id="seeMoreBtn" class="btn-block btn-see-more hidden" onclick="showAllProfiles()">Load All Profiles</button>
+
+        <button class="fab" onclick="openProfileModal()">+</button>
+    </div>
+
+    <!-- VIEW 2: DASHBOARD -->
+    <div id="view-dashboard" class="view-section">
+        <h2 style="margin-top:0; margin-bottom:20px; font-size:1.5rem;">Dashboard Overview</h2>
+        <div class="dashboard-grid">
+            <div class="stat-card clock-container">
+                <span class="stat-val" id="liveClock">--:--:--</span>
+                <span class="stat-label">System Time</span>
+            </div>
+            <div class="stat-card stat-receivable">
+                <span class="stat-val" id="totalReceivables">₱0</span>
+                <span class="stat-label">Receivables</span>
+            </div>
+            <div class="stat-card stat-collected">
+                <span class="stat-val" id="totalCollected">₱0</span>
+                <span class="stat-label">Collected</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW 3: TOOLS -->
+    <div id="view-tools" class="view-section">
+        <h2 style="margin-top:0; margin-bottom:20px; font-size:1.5rem;">Tools & Actions</h2>
+        <div class="tools-grid">
+            
+            <div class="tool-card" onclick="openTutorialModal()">
+                <div class="tool-icon" style="background:#fef3c7; color:#d97706;">📖</div>
+                <div class="tool-info"><h3>App Tutorial</h3><p>Paano gamitin ang app</p></div>
+            </div>
+
+            <div class="tool-card" onclick="openModal('loanCalcModal')">
+                <div class="tool-icon" style="background:#ecfdf5; color:#10b981;">🧮</div>
+                <div class="tool-info"><h3>Loan Calculator</h3><p>Compute Interest & Hulog</p></div>
+            </div>
+
+            <div class="tool-card" onclick="openModal('dateCalcModal')">
+                <div class="tool-icon" style="background:#eff6ff; color:#3b82f6;">📅</div>
+                <div class="tool-info"><h3>Due Date Finder</h3><p>Kailan ang bayaran?</p></div>
+            </div>
+
+            <div class="tool-card" onclick="openCollectionModal()">
+                <div class="tool-icon" style="background:#fff7ed; color:#f97316;">📋</div>
+                <div class="tool-info"><h3>Collection List</h3><p>Listahan ng sisingilin ngayon</p></div>
+            </div>
+
+            <div class="tool-card" onclick="exportData()">
+                <div class="tool-icon" style="background:#dbeafe; color:#2563eb;">💾</div>
+                <div class="tool-info"><h3>Backup Data</h3><p>I-save ang records sa file</p></div>
+            </div>
+
+            <div class="tool-card" onclick="triggerRestore()">
+                <div class="tool-icon" style="background:#f3e8ff; color:#7c3aed;">📂</div>
+                <div class="tool-info"><h3>Restore Data</h3><p>Ibalik galing sa backup</p></div>
+            </div>
+            <!-- Hidden Input for Restore -->
+            <input type="file" id="restoreFile" accept=".json" style="display:none;" onchange="handleRestore(this)">
+
+            <div class="tool-card" style="opacity:0.7;">
+                <div class="tool-icon" style="background:#ffedd5; color:#ea580c;">✨</div>
+                <div class="tool-info"><h3>AI Risk Analyzer</h3><p>Gamitin sa Profile Details</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchView('home', this)">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            Home
+        </button>
+        <button class="nav-item" onclick="switchView('dashboard', this)">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            Dash
+        </button>
+        <button class="nav-item" onclick="switchView('tools', this)">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            Tools
+        </button>
+    </nav>
+
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast">Saved!</div>
+
+    <!-- === MODALS === -->
+
+    <!-- LOAN CALCULATOR -->
+    <div class="modal-overlay" id="loanCalcModal">
+        <div class="modal-content">
+            <h2 style="margin-top:0;">🧮 Loan Calculator</h2>
+            <div class="form-group"><label>Principal Amount (Puhunan)</label><input type="number" id="lc_principal" placeholder="Ex. 5000"></div>
+            <div class="form-group"><label>Interest Rate (%)</label><input type="number" id="lc_rate" placeholder="Ex. 20"></div>
+            <div class="form-group"><label>Duration (Ilang Araw/Linggo)</label><input type="number" id="lc_duration" placeholder="Ex. 60"></div>
+            <div class="form-group"><label>Terms</label>
+                <select id="lc_terms"><option value="1">Daily (Araw-araw)</option><option value="7">Weekly (Lingguhan)</option><option value="15">Kinsenas</option><option value="30">Monthly</option></select>
+            </div>
+            <button class="btn-block btn-primary" onclick="calculateLoan()">COMPUTE</button>
+            <div id="lc_result" class="calc-result-box"></div>
+            <button class="btn-block btn-secondary" onclick="closeModal('loanCalcModal')">CLOSE</button>
+        </div>
+    </div>
+
+    <!-- DATE CALCULATOR -->
+    <div class="modal-overlay" id="dateCalcModal">
+        <div class="modal-content">
+            <h2 style="margin-top:0;">📅 Due Date Finder</h2>
+            <div class="form-group"><label>Start Date (Simula)</label><input type="date" id="dc_start"></div>
+            <div class="form-group"><label>Add Duration</label><input type="number" id="dc_add" placeholder="Ilang araw? Ex. 45"></div>
+            <div class="form-group"><label>Unit</label>
+                <select id="dc_unit"><option value="days">Days</option><option value="weeks">Weeks</option><option value="months">Months</option></select>
+            </div>
+            <button class="btn-block btn-primary" onclick="calculateDate()">FIND DATE</button>
+            <div id="dc_result" class="date-result-box"></div>
+            <button class="btn-block btn-secondary" onclick="closeModal('dateCalcModal')">CLOSE</button>
+        </div>
+    </div>
+
+    <!-- COLLECTION LIST -->
+    <div class="modal-overlay" id="collectionListModal">
+        <div class="modal-content">
+            <h2 style="margin-top:0;">📋 Collection List</h2>
+            <p style="color:#64748b; font-size:0.9rem;">Listahan ng mga dapat singilin NGAYON at OVERDUE.</p>
+            <textarea id="cl_output" class="collection-list-box" readonly></textarea>
+            <button class="btn-block btn-primary" onclick="copyCollectionList()">📋 COPY TO CLIPBOARD</button>
+            <button class="btn-block btn-secondary" onclick="closeModal('collectionListModal')">CLOSE</button>
+        </div>
+    </div>
+
+    <!-- PROFILE MODAL -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="modal-content">
+            <h2 id="profileModalTitle" style="margin-top:0;">New Borrower</h2>
+            <form id="profileForm" onsubmit="handleSaveProfile(event)">
+                <input type="hidden" id="p_id">
+                <div class="form-group" style="text-align: center;">
+                    <img id="p_preview" src="" class="avatar" style="width: 100px; height: 100px; display: none; margin: 0 auto 15px;">
+                    <label class="btn-block btn-secondary" style="width: auto; display:inline-block; padding: 10px 25px; font-size:0.9rem;">
+                        📸 Add Photo
+                        <input type="file" id="p_photo" accept="image/*" style="display: none;" onchange="handleImageUpload(this)">
+                    </label>
+                    <input type="hidden" id="p_photo_base64">
+                </div>
+                <div class="form-group"><label>Full Name</label><input type="text" id="p_name" required placeholder="Name"></div>
+                <div class="form-group"><label>Mobile</label><input type="tel" id="p_phone" required placeholder="09xxxxxxxxx"></div>
+                <div class="form-group"><label>Address</label><input type="text" id="p_address" required></div>
+                <div class="form-group"><label>Age</label><input type="number" id="p_age" style="width: 100px;"></div>
+                <div class="form-group">
+                    <label>Terms</label>
+                    <select id="p_terms"><option value="Daily">Daily</option><option value="Weekly">Weekly</option><option value="Kinsenas">Kinsenas</option><option value="Monthly">Monthly</option></select>
+                </div>
+                <div class="form-group"><label>Next Due</label><input type="date" id="p_dueDate" required></div>
+                <button type="submit" class="btn-block btn-primary">SAVE PROFILE</button>
+                <button type="button" class="btn-block btn-secondary" onclick="closeModal('profileModal')">CANCEL</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- DETAILS MODAL -->
+    <div class="modal-overlay" id="detailsModal">
+        <div class="modal-content">
+            <div style="display:flex; align-items:center; gap:15px; margin-bottom: 20px;">
+                <img id="d_avatar" class="avatar" style="width:70px; height:70px;">
+                <div style="overflow:hidden;">
+                    <h2 id="d_name" style="margin:0; font-size:1.3rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></h2>
+                    <div id="d_phone" style="color:var(--text-light);"></div>
+                </div>
+            </div>
+            <div style="background: linear-gradient(135deg, #f8fafc, #f1f5f9); padding: 20px; border-radius: 16px; margin-bottom: 20px; text-align:center; border: 1px solid #e2e8f0;">
+                <label style="margin-bottom:0;">Current Balance</label>
+                <div id="d_balance" style="font-size: 2.2rem; font-weight: 800; color:var(--text-dark);"></div>
+                <div id="d_due" style="font-size:0.85rem; color:#dc2626; margin-top:5px; font-weight:700;"></div>
+            </div>
+            
+            <button class="btn-block btn-primary" onclick="analyzeBorrower()" style="margin-bottom: 20px; background: linear-gradient(135deg, #a855f7, #ec4899);">✨ ANALYZE RISK (AI)</button>
+            <div id="aiAnalysisResult" class="ai-result-box"></div>
+            
+            <h3 style="font-size:1.1rem; margin-bottom:10px;">New Transaction</h3>
+            <form onsubmit="handleAddTransaction(event)">
+                <div style="display: flex; gap: 10px; margin-bottom:10px;">
+                    <select id="t_type" style="flex:1;"><option value="Payment">Payment</option><option value="Loan">New Loan</option></select>
+                    <input type="number" id="t_amount" placeholder="Amount" style="flex:1;" required step="0.01">
+                </div>
+                <input type="text" id="t_notes" placeholder="Notes (Optional)" style="margin-bottom:10px;">
+                <button type="submit" class="btn-block btn-primary" style="margin-top:0;">SUBMIT</button>
+            </form>
+            
+            <h3 style="font-size:1.1rem; margin-top:20px; margin-bottom:10px;">History</h3>
+            <div style="max-height: 200px; overflow-y: auto; border:1px solid #f1f5f9; border-radius:12px;">
+                <table id="historyTable" style="margin-top:0;"><thead><tr style="background:#f1f5f9;"><th>Date</th><th>Type</th><th>Note</th><th>Amt</th></tr></thead><tbody></tbody></table>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:20px;">
+                <button class="btn-block btn-secondary" style="margin:0;" onclick="editCurrentProfile()">EDIT</button>
+                <button class="btn-block btn-secondary" style="margin:0;" onclick="closeModal('detailsModal')">CLOSE</button>
+            </div>
+            <button class="btn-block btn-danger" onclick="deleteCurrentProfile()">DELETE PROFILE</button>
+        </div>
+    </div>
+
+    <!-- RECEIPT MODAL -->
+    <div class="modal-overlay" id="receiptModal">
+        <div class="modal-content">
+            <h2 style="text-align:center; color: var(--primary-neon);">Transaction Success</h2>
+            <div class="receipt-paper">
+                <div class="receipt-header">PAYMENT RECEIPT</div>
+                <div class="receipt-row"><span>Date:</span> <span id="r_date"></span></div>
+                <div class="receipt-row"><span>Payer:</span> <span id="r_name"></span></div>
+                <div class="receipt-row"><span>Amount Paid:</span> <span id="r_amount" style="font-weight:bold;"></span></div>
+                <div class="receipt-total"><span>Remaining Bal:</span> <span id="r_balance"></span></div>
+            </div>
+            <button class="btn-block btn-primary" onclick="closeReceipt()">BACK TO HOME</button>
+        </div>
+    </div>
+
+    <!-- SMS MODAL -->
+    <div class="modal-overlay" id="smsModal">
+        <div class="modal-content" style="border-top: 6px solid #ef4444;">
+            <h2 style="color:#b91c1c; margin-top:0;">Payment Notice</h2>
+            <div class="form-group"><label>Outstanding Balance</label><input type="text" id="s_balance" readonly></div>
+            <div class="form-group">
+                <label>Penalty (%)</label>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <input type="number" id="s_penalty" value="0" oninput="calculateSMS()" style="width:80px;">
+                    <span id="s_status" style="font-size:0.85rem;"></span>
+                </div>
+            </div>
+            <div class="form-group"><label>Total Due</label><input type="text" id="s_total" readonly style="font-weight:800; color:#dc2626;"></div>
+            <div class="form-group" style="background: #fdf4ff; padding: 12px; border-radius: 12px;">
+                <label style="color:#86198f;">✨ AI Composer</label>
+                <div style="display:flex; gap:8px;">
+                    <select id="s_ai_tone" style="flex:1;"><option value="Polite">Mabait</option><option value="Serious">Seryoso</option></select>
+                    <button type="button" class="btn-block" style="background:#d946ef; color:white; width:auto; padding:0 20px; margin:0;" onclick="generateAISMS()">Draft</button>
+                </div>
+            </div>
+            <div class="form-group"><label>Message Preview</label><textarea id="s_message" class="msg-preview" rows="4"></textarea></div>
+            <div style="display:flex; gap:10px; flex-direction:column;">
+                <button class="btn-block btn-secondary" onclick="copySMS()">📋 COPY TEXT</button>
+                <button id="smsDirectBtn" type="button" class="btn-block btn-sms" onclick="safeOpenSMS()">📩 OPEN SMS APP</button>
+            </div>
+            <button class="btn-block btn-secondary" onclick="closeModal('smsModal')">CANCEL</button>
+        </div>
+    </div>
+
+    <!-- TUTORIAL MODAL -->
+    <div class="modal-overlay" id="tutorialModal">
+        <div class="modal-content" style="height:80vh; display:flex; flex-direction:column; padding:0;">
+            <div style="padding:25px 25px 10px 25px;">
+                <h2 style="margin-top:0; margin-bottom:15px;">📖 App Guide</h2>
+                <div class="tutorial-tabs">
+                    <div class="tut-tab active" onclick="switchTutTab('intro', this)">Panimula</div>
+                    <div class="tut-tab" onclick="switchTutTab('trans', this)">Transaksyon</div>
+                    <div class="tut-tab" onclick="switchTutTab('sms', this)">SMS & AI</div>
+                    <div class="tut-tab" onclick="switchTutTab('data', this)">Data Safety</div>
+                </div>
+            </div>
+            <div style="flex:1; overflow-y:auto; padding:0 25px 25px 25px;">
+                <div id="tut-intro" class="tut-content active">
+                    <div class="tut-step"><h4>👋 Welcome!</h4><p>Ang app na ito ay 100% Offline. Ang data ay nasa iyong phone.</p></div>
+                    <div class="tut-step"><h4>➕ Pagdagdag</h4><p>Click (+) button sa Home. Ilagay ang detalye at picture.</p></div>
+                </div>
+                <div id="tut-trans" class="tut-content">
+                    <div class="tut-step"><h4>💰 Payments</h4><p>Click profile -> New Transaction -> Payment. May resibo pagkatapos.</p></div>
+                </div>
+                <div id="tut-sms" class="tut-content">
+                    <div class="tut-step"><h4>🔔 Alerts</h4><p>May lalabas na Red Bell kung due na. Click ito para mag-text.</p></div>
+                </div>
+                <div id="tut-data" class="tut-content">
+                    <div class="tut-step"><h4>💾 Backup</h4><p>Pumunta sa Tools -> Backup Data. Gawin ito palagi.</p></div>
+                </div>
+            </div>
+            <div style="padding:15px 25px; border-top:1px solid #eee;">
+                <button class="btn-block btn-secondary" onclick="closeModal('tutorialModal')">CLOSE GUIDE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONNECT JS FILE -->
+    <script src="script.js"></script>
+    
+</body>
+                                                            </html>
+  
