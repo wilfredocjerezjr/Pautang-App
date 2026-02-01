@@ -6,6 +6,7 @@ let activeSMSId = null;
 let showAll = false;
 let activeBook = 'crj'; 
 let deferredPrompt;
+const apiKey = ""; 
 
 // --- INITIALIZATION ---
 async function init() {
@@ -274,6 +275,20 @@ function filterHomeList() {
     
     container.innerHTML = '';
     
+    // EMPTY STATE: Show Restore Button
+    if(borrowers.length === 0) { 
+        container.innerHTML = `
+            <div style="text-align:center; padding:30px; color:#999;">
+                <p style="margin-bottom:20px;">Walang laman. Nag-clear cache ka ba?</p>
+                <button class="btn-block btn-primary" onclick="triggerRestore()" style="background:#22c55e;">
+                    🔄 RESTORE FROM BACKUP
+                </button>
+            </div>
+        `; 
+        if(seeMoreBtn) seeMoreBtn.classList.add('hidden'); 
+        return; 
+    }
+    
     let filtered = borrowers.filter(b => b.name.toLowerCase().includes(query));
     
     if (filter === 'due') {
@@ -298,12 +313,10 @@ function filterHomeList() {
     // Display Logic (Top 4 vs All)
     const displayList = showAll ? filtered : filtered.slice(0, 4);
     
-    if(displayList.length === 0) { 
-        container.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">Walang laman.</p>'; 
-        seeMoreBtn.classList.add('hidden'); 
-        return; 
+    if(displayList.length === 0 && borrowers.length > 0) {
+        container.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">Walang nakitang resulta.</p>';
     }
-    
+
     displayList.forEach(b => {
         const bal = getBal(b);
         let badge = bal <= 0 ? '<span class="badge badge-paid">Paid</span>' : '<span class="badge badge-active">Active</span>';
@@ -340,71 +353,92 @@ function filterHomeList() {
 function showAllProfiles() { showAll = true; filterHomeList(); }
 
 // --- PROFILE & TRANSACTIONS ---
-function handleSaveProfile(e) {
-    e.preventDefault();
+function handleSaveProfile() {
     const id = document.getElementById('p_id').value || Date.now().toString();
+    const name = document.getElementById('p_name').value;
+    const phone = document.getElementById('p_phone').value;
+    
+    if(!name || !phone) { alert("Please fill Name and Phone."); return; }
+
     const terms = document.getElementById('p_terms').value;
     const loanDate = document.getElementById('p_loanDate').value;
     
+    const isNew = !document.getElementById('p_id').value;
+    let tx = [];
+    if(!isNew) {
+        const old = borrowers.find(b => b.id === id);
+        if(old) tx = old.transactions;
+    }
+
     const data = {
-        id: id,
-        name: document.getElementById('p_name').value,
-        phone: document.getElementById('p_phone').value,
+        id, 
+        name, 
+        phone,
         address: document.getElementById('p_address').value,
         age: document.getElementById('p_age').value,
-        terms: terms,
+        terms,
         dueDate: getNextDate(loanDate, terms),
         photo: document.getElementById('p_photo_base64').value,
-        transactions: [],
+        transactions: tx,
         lastUpdated: new Date().toISOString()
     };
-    
-    const idx = borrowers.findIndex(b => b.id === id);
-    if(idx === -1) {
-        borrowers.push(data);
-    } else {
-        data.transactions = borrowers[idx].transactions;
-        borrowers[idx] = data;
+
+    if(isNew) borrowers.push(data);
+    else {
+        const idx = borrowers.findIndex(b => b.id === id);
+        if(idx !== -1) borrowers[idx] = data;
     }
     
     safeSave();
     closeModal('profileModal');
+    if(!isNew && activeBorrowerId === id) openDetails(id);
+    showToast("Profile Saved!");
 }
 
-function handleAddTransaction(e) {
-    e.preventDefault();
+function handleAddTransaction() {
+    if(!activeBorrowerId) return;
     const idx = borrowers.findIndex(b => b.id === activeBorrowerId);
     if(idx === -1) return;
 
-    const amt = parseFloat(document.getElementById('t_amount').value);
-    const type = document.getElementById('t_type').value;
-    const notes = document.getElementById('t_notes').value;
-    const b = borrowers[idx];
+    const amtVal = document.getElementById('t_amount').value;
+    if(!amtVal) { alert("Enter amount"); return; }
     
-    // Update Due Date if new Loan
-    if(type === 'Loan') b.dueDate = getNextDate(new Date(), b.terms);
+    const amt = parseFloat(amtVal);
+    const type = document.getElementById('t_type').value;
+    const note = document.getElementById('t_notes').value;
+    const b = borrowers[idx];
 
-    if(!b.transactions) b.transactions = [];
-    b.transactions.push({ 
+    if(!borrowers[idx].transactions) borrowers[idx].transactions = [];
+
+    // Auto-update due date on new loan
+    if(type === 'Loan') {
+        borrowers[idx].dueDate = getNextDate(new Date(), borrowers[idx].terms);
+    }
+
+    borrowers[idx].transactions.push({
         type, 
         amount: amt, 
-        notes: notes, 
+        notes: note, 
         date: new Date().toISOString() 
     });
     
-    b.lastUpdated = new Date().toISOString();
+    borrowers[idx].lastUpdated = new Date().toISOString();
+    document.getElementById('t_amount').value = '';
+    document.getElementById('t_notes').value = '';
+
     safeSave();
     openDetails(activeBorrowerId);
     
     if(type === 'Payment') {
         // Show Receipt
         document.getElementById('r_date').innerText = new Date().toLocaleDateString();
-        document.getElementById('r_name').innerText = b.name;
+        document.getElementById('r_name').innerText = borrowers[idx].name;
         document.getElementById('r_amount').innerText = '₱' + amt.toLocaleString();
-        document.getElementById('r_balance').innerText = '₱' + getBal(b).toLocaleString();
+        document.getElementById('r_balance').innerText = '₱' + getBal(borrowers[idx]).toLocaleString();
         closeModal('detailsModal');
         openModal('receiptModal');
     }
+    showToast("Transaction Added!");
 }
 
 // --- UTILS & CALCULATORS ---
@@ -617,7 +651,6 @@ function safeOpenSMS() {
     const b = borrowers.find(x => x.id === activeSMSId);
     const msg = document.getElementById('s_message').value;
     const phone = b.phone.replace(/[^0-9+]/g, '');
-    // Standard SMS link
     window.location.href = `sms:${phone}?body=${encodeURIComponent(msg)}`;
 }
 
@@ -651,9 +684,7 @@ function updateDashboard() {
     document.getElementById('totalCollected').innerText = '₱' + tc.toLocaleString();
 }
 
-// AI Placeholders
-async function analyzeBorrower() { alert("Connect to internet for AI features."); }
-async function generateAISMS() { alert("Connect to internet for AI features."); }
+async function analyzeBorrower() { alert("Offline Mode. Connect to use AI."); }
+async function generateAISMS() { alert("Offline Mode. Connect to use AI."); }
 
-// START APP
 window.onload = init;
