@@ -1,10 +1,10 @@
-/* START: script.js */
+
 const DB_KEY = 'primal_ledger_v3';
 let borrowers = [];
 let activeBorrowerId = null;
 let activeSMSId = null;
 let showAll = false;
-let activeBook = 'crj'; // Default book view
+let activeBook = 'crj'; 
 let deferredPrompt;
 
 // --- INITIALIZATION ---
@@ -550,4 +550,110 @@ function editCurrentProfile() {
     closeModal('detailsModal');
     const b = borrowers.find(x => x.id === activeBorrowerId);
     document.getElementById('p_id').value = b.id;
-    document.getElementById('p_name').valu
+    document.getElementById('p_name').value = b.name;
+    document.getElementById('p_phone').value = b.phone;
+    document.getElementById('p_address').value = b.address;
+    document.getElementById('p_age').value = b.age;
+    document.getElementById('p_terms').value = b.terms;
+    document.getElementById('p_dueDateDisplay').value = b.dueDate;
+    document.getElementById('p_photo_base64').value = b.photo || '';
+    if(b.photo) {
+        document.getElementById('p_preview').src = b.photo;
+        document.getElementById('p_preview').style.display = 'block';
+    }
+    openModal('profileModal');
+}
+
+function deleteCurrentProfile() {
+    if(confirm("BURAHIN? Di na ito maibabalik.")) {
+        borrowers = borrowers.filter(b => b.id !== activeBorrowerId);
+        safeSave();
+        closeModal('detailsModal');
+    }
+}
+
+function handleImageUpload(i) {
+    if (i.files[0]) {
+        const r = new FileReader();
+        r.onload = e => {
+            const img = new Image();
+            img.onload = () => {
+                const c = document.createElement('canvas');
+                const ctx = c.getContext('2d');
+                let w = img.width, h = img.height;
+                // Compress logic
+                if (w > 250) { h *= 250 / w; w = 250; }
+                c.width = w; c.height = h;
+                ctx.drawImage(img, 0, 0, w, h);
+                const d = c.toDataURL('image/jpeg', 0.5);
+                document.getElementById('p_preview').src = d;
+                document.getElementById('p_preview').style.display = 'block';
+                document.getElementById('p_photo_base64').value = d;
+            };
+            img.src = e.target.result;
+        };
+        r.readAsDataURL(i.files[0]);
+    }
+}
+
+function openSMS(id) {
+    activeSMSId = id;
+    const b = borrowers.find(x => x.id === id);
+    document.getElementById('s_balance').value = getBal(b);
+    calculateSMS();
+    openModal('smsModal');
+}
+
+function calculateSMS() {
+    const b = borrowers.find(x => x.id === activeSMSId);
+    const bal = parseFloat(document.getElementById('s_balance').value);
+    const pen = parseFloat(document.getElementById('s_penalty').value) || 0;
+    const tot = bal + (bal * (pen / 100));
+    document.getElementById('s_total').value = '₱' + tot.toLocaleString();
+    document.getElementById('s_message').value = `Hi ${b.name}, Balance: ₱${bal.toLocaleString()}. Total: ₱${tot.toLocaleString()}.`;
+}
+
+function safeOpenSMS() {
+    const b = borrowers.find(x => x.id === activeSMSId);
+    const msg = document.getElementById('s_message').value;
+    const phone = b.phone.replace(/[^0-9+]/g, '');
+    // Standard SMS link
+    window.location.href = `sms:${phone}?body=${encodeURIComponent(msg)}`;
+}
+
+function copySMS() {
+    navigator.clipboard.writeText(document.getElementById('s_message').value);
+    showToast("Copied!");
+}
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.innerText = msg;
+    t.className = 'show';
+    setTimeout(() => t.className = '', 2000);
+}
+
+function startClock() {
+    setInterval(() => {
+        if (document.getElementById('liveClock')) document.getElementById('liveClock').innerText = new Date().toLocaleTimeString();
+    }, 1000);
+}
+
+function updateDashboard() {
+    let tr = 0, tc = 0;
+    borrowers.forEach(b => {
+        (b.transactions || []).forEach(t => {
+            if (t.type === 'Loan') tr += t.amount;
+            else { tr -= t.amount; tc += t.amount; }
+        });
+    });
+    document.getElementById('totalReceivables').innerText = '₱' + tr.toLocaleString();
+    document.getElementById('totalCollected').innerText = '₱' + tc.toLocaleString();
+}
+
+// AI Placeholders
+async function analyzeBorrower() { alert("Connect to internet for AI features."); }
+async function generateAISMS() { alert("Connect to internet for AI features."); }
+
+// START APP
+window.onload = init;
