@@ -11,7 +11,8 @@ let deferredPrompt;
 async function init() {
     // 1. Request Persistent Storage (Anti-Delete)
     if (navigator.storage && navigator.storage.persist) {
-        await navigator.storage.persist();
+        const isPersisted = await navigator.storage.persist();
+        console.log(`Persisted: ${isPersisted}`);
     }
 
     // 2. Load Data
@@ -27,7 +28,7 @@ async function init() {
     filterHomeList(); 
     updateDashboard(); 
     startClock(); 
-    generateBooks('crj'); // Default to Cash Receipts
+    generateBooks('crj'); 
     
     // 4. Default Date
     const loanDateInput = document.getElementById('p_loanDate');
@@ -68,8 +69,10 @@ function safeSave() {
         const activeTab = document.querySelector('.book-tab.active');
         if(activeTab) {
             const onclickText = activeTab.getAttribute('onclick');
-            const bookType = onclickText.split("'")[1];
-            generateBooks(bookType);
+            if(onclickText) {
+                const bookType = onclickText.split("'")[1];
+                generateBooks(bookType);
+            }
         }
         
     } catch (e) { 
@@ -547,6 +550,4 @@ function editCurrentProfile() {
     closeModal('detailsModal');
     const b = borrowers.find(x => x.id === activeBorrowerId);
     document.getElementById('p_id').value = b.id;
-    document.getElementById('p_name').value = b.name;
-    document.getElementById('p_phone').value = b.phone;
-    document.getElementById
+    document.getElementById('p_name').valu
