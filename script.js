@@ -1,4 +1,3 @@
-
 const DB_KEY = 'primal_ledger_v3';
 let borrowers = [];
 let activeBorrowerId = null;
@@ -40,8 +39,8 @@ async function init() {
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    const installCard = document.getElementById('installAppCard');
-    if(installCard) installCard.style.display = 'flex';
+    const card = document.getElementById('installAppCard');
+    if(card) card.style.display = 'flex';
 });
 
 async function installPWA() {
@@ -59,25 +58,22 @@ async function installPWA() {
 function safeSave() {
     try {
         if(!borrowers) borrowers = [];
-        // Sort by latest update
+        // Sort: Latest updated first
         borrowers.sort((a, b) => new Date(b.lastUpdated || 0) - new Date(a.lastUpdated || 0));
         localStorage.setItem(DB_KEY, JSON.stringify(borrowers));
         
         updateDashboard(); 
         filterHomeList(); 
         
-        // Refresh active book if open
+        // Refresh active book
         const activeTab = document.querySelector('.book-tab.active');
         if(activeTab) {
-            const onclickText = activeTab.getAttribute('onclick');
-            if(onclickText) {
-                const bookType = onclickText.split("'")[1];
-                generateBooks(bookType);
-            }
+            const onclick = activeTab.getAttribute('onclick');
+            if(onclick) generateBooks(onclick.split("'")[1]);
         }
         
     } catch (e) { 
-        alert("Storage Full! Please backup and delete old records."); 
+        if(e.name.includes('Quota')) alert("Storage Full! Please backup and delete old records."); 
     }
 }
 
@@ -100,7 +96,7 @@ function autoCalcDueDateInForm() {
     }
 }
 
-// --- BOOKS OF ACCOUNTS (Strict BIR Format Logic) ---
+// --- BOOKS OF ACCOUNTS ---
 function switchBook(type, btn) {
     activeBook = type;
     document.querySelectorAll('.book-tab').forEach(b => b.classList.remove('active'));
@@ -124,8 +120,8 @@ function generateBooks(type) {
     allTrans.sort((a,b) => new Date(b.date) - new Date(a.date));
 
     if (type === 'crj') {
-        // Cash Receipts Journal (Payments In)
-        html = `<thead><tr><th>Date</th><th>Payer</th><th>Ref/Note</th><th>Debit (Cash)</th><th>Credit (AR)</th></tr></thead><tbody>`;
+        // Cash Receipts
+        html = `<thead><tr><th>Date</th><th>Payer</th><th>Ref</th><th>Debit (Cash)</th><th>Credit (AR)</th></tr></thead><tbody>`;
         allTrans.filter(t => t.type === 'Payment').forEach(t => {
             html += `<tr class="crj-row">
                 <td>${new Date(t.date).toLocaleDateString()}</td>
@@ -138,8 +134,8 @@ function generateBooks(type) {
         html += `</tbody>`;
         
     } else if (type === 'cdj') {
-        // Cash Disbursements Journal (Loans Out)
-        html = `<thead><tr><th>Date</th><th>Payee</th><th>Ref/Note</th><th>Debit (AR)</th><th>Credit (Cash)</th></tr></thead><tbody>`;
+        // Cash Disbursements
+        html = `<thead><tr><th>Date</th><th>Payee</th><th>Ref</th><th>Debit (AR)</th><th>Credit (Cash)</th></tr></thead><tbody>`;
         allTrans.filter(t => t.type === 'Loan').forEach(t => {
             html += `<tr class="cdj-row">
                 <td>${new Date(t.date).toLocaleDateString()}</td>
@@ -152,24 +148,22 @@ function generateBooks(type) {
         html += `</tbody>`;
         
     } else if (type === 'gj') {
-        // General Journal (Detailed Entry)
+        // General Journal
          html = `<thead><tr><th>Date</th><th>Account Title</th><th>Ref</th><th>Debit</th><th>Credit</th></tr></thead><tbody>`;
          allTrans.forEach(t => {
-            let debitAccount = t.type === 'Loan' ? 'Accounts Receivable' : 'Cash';
-            let creditAccount = t.type === 'Loan' ? 'Cash' : 'Accounts Receivable';
+            let debit = t.type === 'Loan' ? 'Accounts Receivable' : 'Cash';
+            let credit = t.type === 'Loan' ? 'Cash' : 'Accounts Receivable';
             
-            // Debit Entry
             html += `<tr class="gj-row">
                 <td>${new Date(t.date).toLocaleDateString()}</td>
-                <td>${debitAccount}</td>
+                <td>${debit}</td>
                 <td>${t.notes || '-'}</td>
                 <td>${t.amount.toLocaleString()}</td>
                 <td>-</td>
-            </tr>`;
-            // Credit Entry
-            html += `<tr class="gj-row">
+            </tr>
+            <tr class="gj-row">
                 <td></td>
-                <td style="padding-left:20px;">${creditAccount}</td>
+                <td style="padding-left:20px;">${credit}</td>
                 <td></td>
                 <td>-</td>
                 <td>${t.amount.toLocaleString()}</td>
@@ -178,7 +172,7 @@ function generateBooks(type) {
          html += `</tbody>`;
          
     } else if (type === 'gl') {
-        // General Ledger (Summary)
+        // General Ledger
         let totalCash = 0; 
         let totalAR = 0;
         
@@ -187,7 +181,6 @@ function generateBooks(type) {
                 totalCash += t.amount; 
                 totalAR -= t.amount; 
             } else { 
-                // Loan
                 totalCash -= t.amount; 
                 totalAR += t.amount; 
             }
@@ -208,11 +201,10 @@ function generateBooks(type) {
             </tr>
         </tbody>`;
     }
-    
     table.innerHTML = html;
 }
 
-// --- EXPORT SYSTEM (TOOLS) ---
+// --- EXPORT LOGIC ---
 function openExportModal() { openModal('exportModal'); }
 
 function runExport() {
@@ -225,18 +217,15 @@ function runExport() {
     let csvContent = "data:text/csv;charset=utf-8,";
     let allTrans = [];
     
-    // Gather data
     borrowers.forEach(b => { 
         (b.transactions || []).forEach(t => { 
             allTrans.push({ ...t, name: b.name }); 
         }); 
     });
     
-    // Filter Date
     if(start) allTrans = allTrans.filter(t => new Date(t.date) >= start);
     if(end) allTrans = allTrans.filter(t => new Date(t.date) <= end);
 
-    // Header & Rows based on Type
     if (type === 'CRJ') {
         csvContent += "Date,Payer,Reference,Debit(Cash),Credit(AR)\n";
         allTrans.filter(t => t.type === 'Payment').forEach(t => { 
@@ -248,14 +237,12 @@ function runExport() {
             csvContent += `${new Date(t.date).toLocaleDateString()},${t.name},${t.notes||''},${t.amount},${t.amount}\n`; 
         });
     } else {
-        // Generic / GL Dump
         csvContent += "Date,Account,Type,Amount,Notes\n";
         allTrans.forEach(t => { 
             csvContent += `${new Date(t.date).toLocaleDateString()},${t.name},${t.type},${t.amount},${t.notes||''}\n`; 
         });
     }
 
-    // Trigger Download
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -310,7 +297,6 @@ function filterHomeList() {
         return new Date(b.lastUpdated) - new Date(a.lastUpdated);
     });
     
-    // Display Logic (Top 4 vs All)
     const displayList = showAll ? filtered : filtered.slice(0, 4);
     
     if(displayList.length === 0 && borrowers.length > 0) {
@@ -684,7 +670,7 @@ function updateDashboard() {
     document.getElementById('totalCollected').innerText = '₱' + tc.toLocaleString();
 }
 
-async function analyzeBorrower() { alert("Offline Mode. Connect to use AI."); }
-async function generateAISMS() { alert("Offline Mode. Connect to use AI."); }
+async function analyzeBorrower() { alert("Connect to internet for AI features."); }
+async function generateAISMS() { alert("Connect to internet for AI features."); }
 
 window.onload = init;
