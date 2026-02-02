@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#eff6ff">
     
-    <!-- PWA Settings -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,9 +13,7 @@
     <meta name="description" content="BIR Compliant Lending App">
     
     <title>Pautang App Pro</title>
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
-    <!-- Link to CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -27,13 +24,11 @@
         <h1>Pautang App <span style="font-size:0.6em; vertical-align:middle; background:#dcfce7; color:#166534; padding:2px 6px; border-radius:4px; margin-left:5px;">PRO</span></h1>
     </header>
 
-    <!-- SAFETY BANNER -->
     <div id="safetyBanner">
-        <span>⚠️ I-save sa Phone Storage para SAFE.</span>
+        <span>⚠️ Laging i-save sa Phone Storage.</span>
         <button onclick="exportData()">SAVE NOW</button>
     </div>
 
-    <!-- VIEW 1: HOME -->
     <div id="view-home" class="view-section active">
         <div class="search-container">
             <input type="text" id="searchInput" class="search-bar" placeholder="Maghanap..." onkeyup="filterHomeList()">
@@ -51,7 +46,6 @@
         <button class="fab" onclick="openProfileModal()">+</button>
     </div>
 
-    <!-- VIEW 2: DASHBOARD -->
     <div id="view-dashboard" class="view-section">
         <h2 style="margin-top:0; margin-bottom:20px;">Dashboard Overview</h2>
         <div class="dashboard-grid">
@@ -69,8 +63,6 @@
             </div>
         </div>
     </div>
-    
-    <!-- VIEW 3: BOOKS OF ACCOUNTS -->
     <div id="view-books" class="view-section">
         <h2 style="margin-top:0; margin-bottom:20px;">Books of Accounts</h2>
         
@@ -83,19 +75,15 @@
 
         <div class="book-container">
             <div class="book-table-wrapper">
-                <table class="book-table" id="bookTableContent">
-                    <!-- Dynamic Content -->
-                </table>
+                <table class="book-table" id="bookTableContent"></table>
             </div>
         </div>
         <p style="font-size:0.8rem; color:#999; margin-top:10px; text-align:center;">* Auto-generated based on BIR Standards.</p>
     </div>
 
-    <!-- VIEW 4: TOOLS -->
     <div id="view-tools" class="view-section">
         <h2 style="margin-top:0; margin-bottom:20px;">Tools & Export</h2>
         
-        <!-- PWA INSTALLER -->
         <div id="installAppCard" class="tool-card" style="background:#dbeafe; border-color:#93c5fd; display:none;" onclick="installPWA()">
             <div class="tool-icon" style="background:#2563eb; color:white;">⬇️</div>
             <div class="tool-info"><h3 style="color:#1e40af;">Install App</h3><p>Gawing totoong app</p></div>
@@ -106,45 +94,37 @@
                 <div class="tool-icon">📊</div>
                 <div class="tool-info"><h3 style="color:#15803d;">Export Records</h3><p>Download Excel/CSV</p></div>
             </div>
-
             <div class="tool-card" onclick="openTutorialModal()">
                 <div class="tool-icon" style="background:#fef3c7; color:#d97706;">📖</div>
                 <div class="tool-info"><h3>App Tutorial</h3><p>Guide</p></div>
             </div>
-            
             <div class="tool-card" onclick="exportData()">
                 <div class="tool-icon" style="background:#dbeafe; color:#2563eb;">💾</div>
                 <div class="tool-info"><h3>Save to Storage</h3><p>Backup (Safety)</p></div>
             </div>
-            
             <div class="tool-card" onclick="triggerRestore()">
                 <div class="tool-icon" style="background:#f3e8ff; color:#7c3aed;">📂</div>
                 <div class="tool-info"><h3>Restore Data</h3><p>Ibalik galing backup</p></div>
             </div>
-
             <div class="tool-card" onclick="openModal('loanCalcModal')">
                 <div class="tool-icon" style="background:#ecfdf5; color:#10b981;">🧮</div>
                 <div class="tool-info"><h3>Calculator</h3><p>Interest</p></div>
             </div>
-            
             <div class="tool-card" onclick="openModal('dateCalcModal')">
                 <div class="tool-icon" style="background:#eff6ff; color:#3b82f6;">📅</div>
                 <div class="tool-info"><h3>Due Date</h3><p>Finder</p></div>
             </div>
-            
             <div class="tool-card" onclick="openCollectionModal()">
                 <div class="tool-icon" style="background:#fff7ed; color:#f97316;">📋</div>
                 <div class="tool-info"><h3>Collection</h3><p>Listahan</p></div>
             </div>
-            
             <input type="file" id="restoreFile" accept=".json,application/json" style="display:none;" onchange="handleRestore(this)">
         </div>
     </div>
 
-    <!-- BOTTOM NAV -->
     <nav class="bottom-nav">
         <button class="nav-item active" onclick="switchView('home', this)">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> Home
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 01-1 1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> Home
         </button>
         <button class="nav-item" onclick="switchView('dashboard', this)">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg> Dash
@@ -159,14 +139,12 @@
 
     </div>
 
-    <!-- TOAST -->
     <div id="toast">Notification</div>
 
-    <!-- MODAL: ADD/EDIT -->
     <div class="modal-overlay" id="profileModal">
         <div class="modal-content">
             <h2 id="modalTitle">New Borrower</h2>
-            <form id="profileForm" onsubmit="return false;">
+            <div id="profileFormContainer">
                 <input type="hidden" id="p_id">
                 <div class="form-group" style="text-align: center;">
                     <img id="p_preview" src="" class="avatar" style="width:100px; height:100px; margin:auto; display:none;">
@@ -176,8 +154,8 @@
                     </label>
                     <input type="hidden" id="p_photo_base64">
                 </div>
-                <div class="form-group"><label>Name</label><input type="text" id="p_name" required></div>
-                <div class="form-group"><label>Phone</label><input type="tel" id="p_phone" required></div>
+                <div class="form-group"><label>Name</label><input type="text" id="p_name"></div>
+                <div class="form-group"><label>Mobile</label><input type="tel" id="p_phone"></div>
                 <div class="form-group"><label>Address</label><input type="text" id="p_address"></div>
                 <div class="form-group"><label>Terms</label>
                     <select id="p_terms" onchange="autoCalcDueDateInForm()">
@@ -190,13 +168,12 @@
                 <div class="form-group"><label>Loan Date</label><input type="date" id="p_loanDate" onchange="autoCalcDueDateInForm()"></div>
                 <div class="form-group"><label>Next Due (Auto)</label><input type="text" id="p_dueDateDisplay" class="input-readonly" readonly></div>
                 
-                <button type="button" class="btn-block btn-primary" onclick="handleSaveProfile()">SAVE RECORD</button>
+                <button type="button" class="btn-block btn-primary" onclick="handleSaveProfile()" style="z-index:9999; position:relative;">SAVE RECORD</button>
                 <button type="button" class="btn-block btn-secondary" onclick="closeModal('profileModal')">CANCEL</button>
-            </form>
+            </div>
         </div>
     </div>
 
-    <!-- MODAL: DETAILS -->
     <div class="modal-overlay" id="detailsModal">
         <div class="modal-content">
             <div style="display:flex; align-items:center; gap:15px; margin-bottom: 20px;">
@@ -210,19 +187,18 @@
                 <div id="d_due_date" style="font-size:0.9rem; color:#dc2626; font-weight:600;"></div>
             </div>
 
-            <!-- ANALYZE BUTTON -->
             <button class="btn-block btn-primary" onclick="analyzeBorrower()" style="margin-bottom: 20px; background: linear-gradient(135deg, #a855f7, #ec4899);">✨ ANALYZE RISK (AI)</button>
             <div id="aiAnalysisResult" class="ai-result-box"></div>
 
             <h3>Transactions</h3>
-            <form onsubmit="return false;">
+            <div>
                 <div style="display:flex; gap:10px; margin-bottom:10px;">
                     <select id="t_type" style="flex:1;"><option value="Payment">Payment</option><option value="Loan">New Loan</option></select>
-                    <input type="number" id="t_amount" placeholder="Amount" style="flex:1;" required step="0.01">
+                    <input type="number" id="t_amount" placeholder="Amount" style="flex:1;" step="0.01">
                 </div>
                 <input type="text" id="t_notes" placeholder="Notes" style="margin-bottom:10px;">
-                <button type="button" class="btn-block btn-primary" onclick="handleAddTransaction()">SUBMIT</button>
-            </form>
+                <button type="button" class="btn-block btn-primary" onclick="handleAddTransaction()" style="z-index:9999; position:relative;">SUBMIT</button>
+            </div>
 
             <div style="margin-top:20px; max-height:200px; overflow-y:auto;">
                 <table style="width:100%; font-size:0.9rem;">
@@ -239,7 +215,6 @@
         </div>
     </div>
 
-    <!-- DIGITAL RECEIPT -->
     <div class="modal-overlay" id="receiptModal">
         <div class="modal-content">
             <h2 style="text-align:center; color: var(--success);">Success</h2>
@@ -254,7 +229,6 @@
         </div>
     </div>
 
-    <!-- MODAL: EXPORT -->
     <div class="modal-overlay" id="exportModal">
         <div class="modal-content">
             <h2>📊 Export Records</h2>
@@ -274,7 +248,6 @@
         </div>
     </div>
 
-    <!-- SMS MODAL -->
     <div class="modal-overlay" id="smsModal">
         <div class="modal-content" style="border-top: 6px solid #ef4444;">
             <h2 style="color:#b91c1c;">Payment Notice</h2>
@@ -299,12 +272,10 @@
         </div>
     </div>
 
-    <!-- UTILS MODALS -->
     <div class="modal-overlay" id="loanCalcModal"><div class="modal-content"><h2>Loan Calculator</h2><input id="c_P" type="number" placeholder="Principal" class="form-group"><input id="c_R" type="number" placeholder="Interest %" class="form-group"><input id="c_D" type="number" placeholder="Duration (Days)" class="form-group"><button class="btn-block btn-primary" onclick="calcLoan()">COMPUTE</button><div id="c_res" class="calc-result-box"></div><button class="btn-block btn-secondary" onclick="closeModal('loanCalcModal')">CLOSE</button></div></div>
     <div class="modal-overlay" id="dateCalcModal"><div class="modal-content"><h2>Due Date Finder</h2><input id="dc_start" type="date" class="form-group"><input id="dc_add" type="number" placeholder="Days to add" class="form-group"><button class="btn-block btn-primary" onclick="calcDate()">FIND</button><div id="dc_res" class="date-result-box"></div><button class="btn-block btn-secondary" onclick="closeModal('dateCalcModal')">CLOSE</button></div></div>
     <div class="modal-overlay" id="collectionListModal"><div class="modal-content"><h2>Collection List</h2><textarea id="cl_txt" style="width:100%; height:150px; padding:10px;"></textarea><button class="btn-block btn-primary" onclick="copyCL()">COPY</button><button class="btn-block btn-secondary" onclick="closeModal('collectionListModal')">CLOSE</button></div></div>
     
-    <!-- TUTORIAL -->
     <div class="modal-overlay" id="tutorialModal">
         <div class="modal-content" style="height:80vh; display:flex; flex-direction:column; padding:0;">
             <div style="padding:25px;"><h2 style="margin-top:0;">📖 Guide</h2><div class="tutorial-tabs"><div class="tut-tab active" onclick="switchTutTab('intro', this)">Basics</div><div class="tut-tab" onclick="switchTutTab('trans', this)">Transact</div><div class="tut-tab" onclick="switchTutTab('data', this)">SAFETY</div></div></div>
@@ -317,8 +288,7 @@
         </div>
     </div>
 
-    <!-- LINK SCRIPTS -->
     <script src="script.js"></script>
 </body>
-                                                                  </html>
-                            
+                                                                           </html>
+                                                                 
