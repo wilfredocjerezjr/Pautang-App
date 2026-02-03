@@ -2,293 +2,347 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#eff6ff">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pautang App PRO</title>
     
-    <link rel="manifest" href="manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Pautang Pro">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="description" content="BIR Compliant Lending App">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <title>Pautang App Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div id="app-root">
-
+    <!-- HEADER -->
     <header>
-        <h1>Pautang App <span style="font-size:0.6em; vertical-align:middle; background:#dcfce7; color:#166534; padding:2px 6px; border-radius:4px; margin-left:5px;">PRO</span></h1>
+        <div class="header-left">
+            <div class="brand-text">PAUTANG APP</div>
+            <div class="brand-badge">PRO</div>
+        </div>
+        <div class="notif-box">
+            <i class="ph-bold ph-bell" style="font-size:24px; color:var(--text-dark);"></i>
+            <div class="notif-badge" id="notif-count" style="display:none;">0</div>
+        </div>
     </header>
 
-    <div id="safetyBanner">
-        <span>⚠️ Laging i-save sa Phone Storage.</span>
-        <button onclick="exportData()">SAVE NOW</button>
+    <!-- SAFETY BANNER -->
+    <div class="safety-banner">
+        <div><i class="ph-fill ph-warning" style="margin-right:4px;"></i> Keep data safe.</div>
+        <button class="btn-banner" onclick="app.exportBackup()">BACKUP NOW</button>
     </div>
 
-    <div id="view-home" class="view-section active">
-        <div class="search-container">
-            <input type="text" id="searchInput" class="search-bar" placeholder="Maghanap..." onkeyup="filterHomeList()">
-            <select id="filterSelect" class="filter-select" onchange="filterHomeList()">
-                <option value="all">Lahat</option>
-                <option value="due">Due Soon</option>
-                <option value="overdue">Overdue</option>
-                <option value="paid">Paid</option>
-            </select>
-        </div>
-
-        <div class="section-title">Priority List</div>
-        <div id="homeListContent"></div>
-        <button id="seeMoreBtn" class="btn-block btn-see-more hidden" onclick="showAllProfiles()">Load All Profiles</button>
-        <button class="fab" onclick="openProfileModal()">+</button>
-    </div>
-
-    <div id="view-dashboard" class="view-section">
-        <h2 style="margin-top:0; margin-bottom:20px;">Dashboard Overview</h2>
-        <div class="dashboard-grid">
-            <div class="stat-card clock-container">
-                <span class="stat-val" id="liveClock">--:--:--</span>
-                <span class="stat-label">System Time</span>
-            </div>
-            <div class="stat-card stat-receivable">
-                <span class="stat-val" id="totalReceivables">₱0</span>
-                <span class="stat-label">Sisingilin</span>
-            </div>
-            <div class="stat-card stat-collected">
-                <span class="stat-val" id="totalCollected">₱0</span>
-                <span class="stat-label">Nasingil</span>
-            </div>
-        </div>
-    </div>
-    <div id="view-books" class="view-section">
-        <h2 style="margin-top:0; margin-bottom:20px;">Books of Accounts</h2>
+    <!-- MAIN CONTENT -->
+    <main>
         
-        <div class="books-nav">
-            <button class="book-tab active" onclick="switchBook('crj', this)">Cash Receipts</button>
-            <button class="book-tab" onclick="switchBook('cdj', this)">Disbursements</button>
-            <button class="book-tab" onclick="switchBook('gj', this)">General Journal</button>
-            <button class="book-tab" onclick="switchBook('gl', this)">General Ledger</button>
-        </div>
-
-        <div class="book-container">
-            <div class="book-table-wrapper">
-                <table class="book-table" id="bookTableContent"></table>
-            </div>
-        </div>
-        <p style="font-size:0.8rem; color:#999; margin-top:10px; text-align:center;">* Auto-generated based on BIR Standards.</p>
-    </div>
-
-    <div id="view-tools" class="view-section">
-        <h2 style="margin-top:0; margin-bottom:20px;">Tools & Export</h2>
-        
-        <div id="installAppCard" class="tool-card" style="background:#dbeafe; border-color:#93c5fd; display:none;" onclick="installPWA()">
-            <div class="tool-icon" style="background:#2563eb; color:white;">⬇️</div>
-            <div class="tool-info"><h3 style="color:#1e40af;">Install App</h3><p>Gawing totoong app</p></div>
-        </div>
-
-        <div class="tools-grid">
-            <div class="tool-card" onclick="openExportModal()" style="background:#f0fdf4; border-color:#22c55e;">
-                <div class="tool-icon">📊</div>
-                <div class="tool-info"><h3 style="color:#15803d;">Export Records</h3><p>Download Excel/CSV</p></div>
-            </div>
-            <div class="tool-card" onclick="openTutorialModal()">
-                <div class="tool-icon" style="background:#fef3c7; color:#d97706;">📖</div>
-                <div class="tool-info"><h3>App Tutorial</h3><p>Guide</p></div>
-            </div>
-            <div class="tool-card" onclick="exportData()">
-                <div class="tool-icon" style="background:#dbeafe; color:#2563eb;">💾</div>
-                <div class="tool-info"><h3>Save to Storage</h3><p>Backup (Safety)</p></div>
-            </div>
-            <div class="tool-card" onclick="triggerRestore()">
-                <div class="tool-icon" style="background:#f3e8ff; color:#7c3aed;">📂</div>
-                <div class="tool-info"><h3>Restore Data</h3><p>Ibalik galing backup</p></div>
-            </div>
-            <div class="tool-card" onclick="openModal('loanCalcModal')">
-                <div class="tool-icon" style="background:#ecfdf5; color:#10b981;">🧮</div>
-                <div class="tool-info"><h3>Calculator</h3><p>Interest</p></div>
-            </div>
-            <div class="tool-card" onclick="openModal('dateCalcModal')">
-                <div class="tool-icon" style="background:#eff6ff; color:#3b82f6;">📅</div>
-                <div class="tool-info"><h3>Due Date</h3><p>Finder</p></div>
-            </div>
-            <div class="tool-card" onclick="openCollectionModal()">
-                <div class="tool-icon" style="background:#fff7ed; color:#f97316;">📋</div>
-                <div class="tool-info"><h3>Collection</h3><p>Listahan</p></div>
-            </div>
-            <input type="file" id="restoreFile" accept=".json,application/json" style="display:none;" onchange="handleRestore(this)">
-        </div>
-    </div>
-
-    <nav class="bottom-nav">
-        <button class="nav-item active" onclick="switchView('home', this)">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 01-1 1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> Home
-        </button>
-        <button class="nav-item" onclick="switchView('dashboard', this)">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg> Dash
-        </button>
-        <button class="nav-item" onclick="switchView('books', this)">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg> Books
-        </button>
-        <button class="nav-item" onclick="switchView('tools', this)">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg> Tools
-        </button>
-    </nav>
-
-    </div>
-
-    <div id="toast">Notification</div>
-
-    <div class="modal-overlay" id="profileModal">
-        <div class="modal-content">
-            <h2 id="modalTitle">New Borrower</h2>
-            <div id="profileFormContainer">
-                <input type="hidden" id="p_id">
-                <div class="form-group" style="text-align: center;">
-                    <img id="p_preview" src="" class="avatar" style="width:100px; height:100px; margin:auto; display:none;">
-                    <label class="btn-block btn-secondary" style="width: auto; display:inline-block; padding: 10px 25px;">
-                        📸 Photo
-                        <input type="file" id="p_photo" accept="image/*" style="display: none;" onchange="handleImageUpload(this)">
-                    </label>
-                    <input type="hidden" id="p_photo_base64">
-                </div>
-                <div class="form-group"><label>Name</label><input type="text" id="p_name"></div>
-                <div class="form-group"><label>Mobile</label><input type="tel" id="p_phone"></div>
-                <div class="form-group"><label>Address</label><input type="text" id="p_address"></div>
-                <div class="form-group"><label>Terms</label>
-                    <select id="p_terms" onchange="autoCalcDueDateInForm()">
-                        <option value="Daily">Daily</option>
-                        <option value="Weekly">Weekly</option>
-                        <option value="Kinsenas">Kinsenas</option>
-                        <option value="Monthly">Monthly</option>
-                    </select>
-                </div>
-                <div class="form-group"><label>Loan Date</label><input type="date" id="p_loanDate" onchange="autoCalcDueDateInForm()"></div>
-                <div class="form-group"><label>Next Due (Auto)</label><input type="text" id="p_dueDateDisplay" class="input-readonly" readonly></div>
-                
-                <button type="button" class="btn-block btn-primary" onclick="handleSaveProfile()" style="z-index:9999; position:relative;">SAVE RECORD</button>
-                <button type="button" class="btn-block btn-secondary" onclick="closeModal('profileModal')">CANCEL</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="detailsModal">
-        <div class="modal-content">
-            <div style="display:flex; align-items:center; gap:15px; margin-bottom: 20px;">
-                <img id="d_avatar" class="avatar" style="width:80px; height:80px;">
-                <div><h2 id="d_name" style="margin:0;"></h2><div id="d_contact" style="color:#64748b;"></div></div>
-            </div>
-            
-            <div style="background: linear-gradient(135deg, #f8fafc, #f1f5f9); padding: 20px; border-radius: 16px; margin-bottom: 20px; text-align:center; border: 1px solid #e2e8f0;">
-                <label>Outstanding Balance</label>
-                <div id="d_balance" style="font-size:2.2rem; font-weight:800; color:#0369a1;"></div>
-                <div id="d_due_date" style="font-size:0.9rem; color:#dc2626; font-weight:600;"></div>
-            </div>
-
-            <button class="btn-block btn-primary" onclick="analyzeBorrower()" style="margin-bottom: 20px; background: linear-gradient(135deg, #a855f7, #ec4899);">✨ ANALYZE RISK (AI)</button>
-            <div id="aiAnalysisResult" class="ai-result-box"></div>
-
-            <h3>Transactions</h3>
-            <div>
-                <div style="display:flex; gap:10px; margin-bottom:10px;">
-                    <select id="t_type" style="flex:1;"><option value="Payment">Payment</option><option value="Loan">New Loan</option></select>
-                    <input type="number" id="t_amount" placeholder="Amount" style="flex:1;" step="0.01">
-                </div>
-                <input type="text" id="t_notes" placeholder="Notes" style="margin-bottom:10px;">
-                <button type="button" class="btn-block btn-primary" onclick="handleAddTransaction()" style="z-index:9999; position:relative;">SUBMIT</button>
-            </div>
-
-            <div style="margin-top:20px; max-height:200px; overflow-y:auto;">
-                <table style="width:100%; font-size:0.9rem;">
-                    <thead><tr style="text-align:left; color:#64748b;"><th>Date</th><th>Type</th><th>Amt</th></tr></thead>
-                    <tbody id="transList"></tbody>
-                </table>
-            </div>
-
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:20px;">
-                <button class="btn-block btn-secondary" onclick="editCurrentProfile()">EDIT</button>
-                <button class="btn-block btn-secondary" onclick="closeModal('detailsModal')">CLOSE</button>
-            </div>
-            <button class="btn-block btn-danger" onclick="deleteCurrentProfile()" style="margin-top:10px;">DELETE</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="receiptModal">
-        <div class="modal-content">
-            <h2 style="text-align:center; color: var(--success);">Success</h2>
-            <div class="receipt-paper">
-                <div class="receipt-header">PAYMENT RECEIPT</div>
-                <div class="receipt-row"><span>Date:</span> <span id="r_date"></span></div>
-                <div class="receipt-row"><span>Name:</span> <span id="r_name"></span></div>
-                <div class="receipt-row"><span>Paid:</span> <span id="r_amount" style="font-weight:bold;"></span></div>
-                <div class="receipt-total"><span>Balance:</span> <span id="r_balance"></span></div>
-            </div>
-            <button class="btn-block btn-primary" onclick="closeReceipt()">OK</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="exportModal">
-        <div class="modal-content">
-            <h2>📊 Export Records</h2>
-            <div class="form-group">
-                <label>Select Book</label>
-                <select id="export_type">
-                    <option value="CRJ">Cash Receipts (CRJ)</option>
-                    <option value="CDJ">Disbursements (CDJ)</option>
-                    <option value="GL">General Ledger (GL)</option>
-                    <option value="GJ">General Journal (GJ)</option>
+        <!-- === HOME VIEW === -->
+        <div id="view-home" class="view active">
+            <div class="search-row">
+                <input type="text" id="search-input" class="search-input-style" placeholder="Maghanap..." onkeyup="app.renderHome()">
+                <select id="filter-select" class="search-input-style" onchange="app.renderHome()">
+                    <option value="all">Lahat</option>
+                    <option value="active">Active</option>
+                    <option value="paid">Paid</option>
                 </select>
             </div>
-            <div class="form-group"><label>From Date</label><input type="date" id="exp_start"></div>
-            <div class="form-group"><label>To Date</label><input type="date" id="exp_end"></div>
-            <button class="btn-block btn-primary" onclick="runExport()">DOWNLOAD CSV</button>
-            <button class="btn-block btn-secondary" onclick="closeModal('exportModal')">CLOSE</button>
-        </div>
-    </div>
 
-    <div class="modal-overlay" id="smsModal">
-        <div class="modal-content" style="border-top: 6px solid #ef4444;">
-            <h2 style="color:#b91c1c;">Payment Notice</h2>
-            <div class="form-group"><label>Outstanding Balance</label><input type="text" id="s_balance" readonly></div>
-            <div class="form-group">
-                <label>Penalty (%)</label>
-                <div style="display:flex; align-items:center; gap:10px;"><input type="number" id="s_penalty" value="0" oninput="calculateSMS()" style="width:80px;"><span id="s_status" style="font-size:0.85rem;"></span></div>
+            <div class="section-title">
+                <span id="home-list-title">PRIORITY 4 LIST</span>
             </div>
-            <div class="form-group"><label>Total Due</label><input type="text" id="s_total" readonly style="font-weight:800; color:#dc2626;"></div>
+
+            <div id="borrower-list">
+                <!-- Dynamic Content -->
+            </div>
+
+            <button id="btn-see-more" class="btn-see-more" style="display:none;" onclick="app.showFullList()">
+                See All Borrowers...
+            </button>
+
+            <div id="empty-state" class="empty-state">
+                <p>No records found.</p>
+                <button class="btn-restore" onclick="document.getElementById('restore-input-home').click()">
+                    <i class="ph-bold ph-arrow-counter-clockwise"></i> RESTORE FROM BACKUP
+                </button>
+                <input type="file" id="restore-input-home" hidden accept=".json" onchange="app.importBackup(this)">
+            </div>
+        </div>
+
+        <!-- === DASHBOARD VIEW === -->
+        <div id="view-dash" class="view">
+            <h2 class="section-title">Dashboard Overview</h2>
             
-            <div class="form-group" style="background: #fdf4ff; padding: 12px; border-radius: 12px;">
-                <label style="color:#86198f;">✨ AI Composer</label>
-                <div style="display:flex; gap:8px;">
-                    <select id="s_ai_tone" style="flex:1;"><option value="Polite">Mabait</option><option value="Serious">Seryoso</option></select>
-                    <button type="button" class="btn-block" style="background:#d946ef; color:white; width:auto; padding:0 20px; margin:0;" onclick="generateAISMS()">Draft</button>
+            <div class="glass-card dash-card-lg">
+                <div class="dash-time" id="system-time">--:--:--</div>
+                <div class="dash-label">SYSTEM TIME</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="glass-card dash-card-sm" style="border-top-color: var(--danger);">
+                    <div class="stat-val text-red" id="dash-receivables">₱0</div>
+                    <div class="dash-label">SISINGILIN</div>
+                </div>
+                <div class="glass-card dash-card-sm" style="border-top-color: var(--success);">
+                    <div class="stat-val text-green" id="dash-collected">₱0</div>
+                    <div class="dash-label">NASINGIL</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === BOOKS VIEW === -->
+        <div id="view-books" class="view">
+            <h2 class="section-title">Books of Accounts</h2>
+            
+            <div class="tabs">
+                <button class="tab-btn active" onclick="app.setBookTab('receipts')">Cash Receipts</button>
+                <button class="tab-btn" onclick="app.setBookTab('disbursements')">Disbursements</button>
+                <button class="tab-btn" onclick="app.setBookTab('general')">General</button>
+            </div>
+
+            <div class="glass-card books-header">
+                <div>Date</div>
+                <div>Payer</div>
+                <div>Ref</div>
+                <div>Amt</div>
+            </div>
+            
+            <div id="books-table-body" class="glass-card" style="padding:0; overflow:hidden;">
+                <!-- Rows -->
+            </div>
+            
+            <div style="text-align:center; font-size:10px; color:var(--text-gray); margin-top:20px; opacity:0.7;">
+                * Auto-generated based on BIR Standards.
+            </div>
+        </div>
+
+        <!-- === TOOLS VIEW === -->
+        <div id="view-tools" class="view">
+            <h2 class="section-title">Tools & Export</h2>
+            
+            <div class="tools-list">
+                <div class="glass-card tool-item" onclick="app.exportCSV()">
+                    <div class="tool-icon-box bg-green"><i class="ph-bold ph-chart-bar"></i></div>
+                    <div class="tool-content"><h4>Export Records</h4><p>Download Excel/CSV</p></div>
+                </div>
+
+                <div class="glass-card tool-item" onclick="app.toggleModal('modal-tutorial', true)">
+                    <div class="tool-icon-box bg-yellow"><i class="ph-bold ph-book-open"></i></div>
+                    <div class="tool-content"><h4>App Tutorial</h4><p>User Manual</p></div>
+                </div>
+
+                <div class="glass-card tool-item" onclick="app.exportBackup()">
+                    <div class="tool-icon-box bg-blue"><i class="ph-bold ph-floppy-disk"></i></div>
+                    <div class="tool-content"><h4>Save to Storage</h4><p>Backup (Safety)</p></div>
+                </div>
+
+                <div class="glass-card tool-item" onclick="document.getElementById('restore-input-tool').click()">
+                    <div class="tool-icon-box bg-gray"><i class="ph-bold ph-folder-open"></i></div>
+                    <div class="tool-content"><h4>Restore Data</h4><p>Ibalik galing backup</p></div>
+                    <input type="file" id="restore-input-tool" hidden accept=".json" onchange="app.importBackup(this)">
+                </div>
+
+                <div class="glass-card tool-item" onclick="app.toggleModal('modal-calc', true)">
+                    <div class="tool-icon-box bg-teal"><i class="ph-bold ph-calculator"></i></div>
+                    <div class="tool-content"><h4>Calculator</h4><p>Interest</p></div>
+                </div>
+            </div>
+        </div>
+
+                        </main>
+                    <!-- FAB -->
+    <button id="fab" class="fab" onclick="app.openCreateModal()">
+        <i class="ph-bold ph-plus"></i>
+    </button>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="app.navTo('home', this)">
+            <i class="ph-bold ph-house"></i><span>Home</span>
+        </div>
+        <div class="nav-item" onclick="app.navTo('dash', this)">
+            <i class="ph-bold ph-chart-bar"></i><span>Dash</span>
+        </div>
+        <div class="nav-item" onclick="app.navTo('books', this)">
+            <i class="ph-bold ph-book-bookmark"></i><span>Books</span>
+        </div>
+        <div class="nav-item" onclick="app.navTo('tools', this)">
+            <i class="ph-bold ph-gear"></i><span>Tools</span>
+        </div>
+    </nav>
+
+    <!-- === MODAL: NEW/EDIT BORROWER === -->
+    <div id="modal-new-borrower" class="modal-overlay">
+        <div class="modal-sheet">
+            <h2 id="modal-new-borrower-title" style="font-size:22px; font-weight:800; margin-bottom:24px; color:var(--text-dark);">New Borrower</h2>
+            
+            <div class="photo-placeholder" onclick="document.getElementById('nb-photo-input').click()" id="nb-photo-preview">
+                <i class="ph-bold ph-camera"></i>
+            </div>
+            <input type="file" id="nb-photo-input" hidden accept="image/*" onchange="app.handleImageUpload(this)">
+
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="nb-name" placeholder="e.g. Juan Dela Cruz">
+            </div>
+
+            <div class="form-group">
+                <label>Mobile Number</label>
+                <input type="tel" id="nb-mobile" placeholder="09xxxxxxxxx">
+            </div>
+
+             <div class="form-group" id="group-amount">
+                <label>Principal Amount (₱)</label>
+                <input type="number" id="nb-amount" placeholder="0.00">
+            </div>
+
+            <!-- NEW FIELDS FOR RATES -->
+            <div class="form-group" id="group-rates" style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                <div>
+                    <label>Interest (%)</label>
+                    <input type="number" id="nb-interest" placeholder="5">
+                </div>
+                <div>
+                    <label>Penalty (%)</label>
+                    <input type="number" id="nb-penalty" placeholder="2">
                 </div>
             </div>
 
-            <div class="form-group"><label>Message Preview</label><textarea id="s_message" class="msg-preview" rows="4"></textarea></div>
-            <div style="display:flex; gap:10px; flex-direction:column;"><button class="btn-block btn-secondary" onclick="copySMS()">📋 COPY</button><button id="smsDirectBtn" type="button" class="btn-block btn-sms" onclick="safeOpenSMS()">📩 OPEN SMS</button></div>
-            <button class="btn-block btn-secondary" onclick="closeModal('smsModal')">CANCEL</button>
+            <div class="form-group">
+                <label>Payment Terms</label>
+                <select id="nb-terms" onchange="app.calculateNextDue()">
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="group-date">
+                <label>Loan Date</label>
+                <input type="date" id="nb-date" onchange="app.calculateNextDue()">
+            </div>
+
+            <div class="form-group" id="group-nextdue">
+                <label>Next Due Date (Auto)</label>
+                <input type="text" id="nb-nextdue" readonly style="background:#e2e8f0; cursor: not-allowed; color:#64748b;">
+            </div>
+
+            <div style="flex:1"></div>
+
+            <button class="btn-block btn-primary" onclick="app.saveBorrower()">SAVE RECORD</button>
+            <button class="btn-block btn-cancel" onclick="app.toggleModal('modal-new-borrower', false)">CANCEL</button>
         </div>
     </div>
 
-    <div class="modal-overlay" id="loanCalcModal"><div class="modal-content"><h2>Loan Calculator</h2><input id="c_P" type="number" placeholder="Principal" class="form-group"><input id="c_R" type="number" placeholder="Interest %" class="form-group"><input id="c_D" type="number" placeholder="Duration (Days)" class="form-group"><button class="btn-block btn-primary" onclick="calcLoan()">COMPUTE</button><div id="c_res" class="calc-result-box"></div><button class="btn-block btn-secondary" onclick="closeModal('loanCalcModal')">CLOSE</button></div></div>
-    <div class="modal-overlay" id="dateCalcModal"><div class="modal-content"><h2>Due Date Finder</h2><input id="dc_start" type="date" class="form-group"><input id="dc_add" type="number" placeholder="Days to add" class="form-group"><button class="btn-block btn-primary" onclick="calcDate()">FIND</button><div id="dc_res" class="date-result-box"></div><button class="btn-block btn-secondary" onclick="closeModal('dateCalcModal')">CLOSE</button></div></div>
-    <div class="modal-overlay" id="collectionListModal"><div class="modal-content"><h2>Collection List</h2><textarea id="cl_txt" style="width:100%; height:150px; padding:10px;"></textarea><button class="btn-block btn-primary" onclick="copyCL()">COPY</button><button class="btn-block btn-secondary" onclick="closeModal('collectionListModal')">CLOSE</button></div></div>
-    
-    <div class="modal-overlay" id="tutorialModal">
-        <div class="modal-content" style="height:80vh; display:flex; flex-direction:column; padding:0;">
-            <div style="padding:25px;"><h2 style="margin-top:0;">📖 Guide</h2><div class="tutorial-tabs"><div class="tut-tab active" onclick="switchTutTab('intro', this)">Basics</div><div class="tut-tab" onclick="switchTutTab('trans', this)">Transact</div><div class="tut-tab" onclick="switchTutTab('data', this)">SAFETY</div></div></div>
-            <div style="flex:1; overflow-y:auto; padding:0 25px;">
-                <div id="tut-intro" class="tut-content active"><div class="tut-step"><h4>Info</h4><p>Offline App ito. Ang data ay nasa phone mo.</p></div></div>
-                <div id="tut-trans" class="tut-content"><div class="tut-step"><h4>Bayad</h4><p>Piliin ang profile -> Payment. May resibo.</p></div></div>
-                <div id="tut-data" class="tut-content"><div class="tut-step"><h4 style="color:red;">⚠️ MAHALAGA: BACKUP</h4><p>Dahil browser-based ito, mabubura ang data pag nag-clear cache ka. <br><br><b>SOLUSYON:</b> Laging pindutin ang <b>Save to Storage</b> sa Tools. Mase-save ito sa Downloads folder mo. Kahit ma-clear cache, pwede mo i-Restore.</p></div></div>
+    <!-- === MODAL: DELETE CONFIRMATION === -->
+    <div id="modal-delete-confirm" class="modal-overlay" style="z-index: 300;">
+        <div class="modal-sheet" style="height: auto;">
+            <h3 style="font-size: 20px; font-weight: 800; color: var(--danger); margin-bottom: 10px; text-align: center;">Delete Profile?</h3>
+            <p style="text-align: center; color: var(--text-gray); font-size: 14px; margin-bottom: 20px;">
+                Are you sure you want to delete this profile? This action cannot be undone.
+            </p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <button class="btn-block btn-cancel" style="margin-top:0;" onclick="app.toggleModal('modal-delete-confirm', false)">NO</button>
+                <button class="btn-block btn-danger" style="margin-top:0;" onclick="app.executeDelete()">YES, DELETE</button>
             </div>
-            <div style="padding:15px 25px;"><button class="btn-block btn-secondary" onclick="closeModal('tutorialModal')">CLOSE</button></div>
         </div>
     </div>
+
+    <!-- === MODAL: BORROWER DETAILS HUB (UPDATED FOR LIST) === -->
+    <div id="modal-borrower-details" class="modal-overlay">
+        <div class="modal-sheet" style="height: 95vh;">
+            <div class="details-header">
+                <div class="details-avatar" id="bd-avatar">J</div>
+                <h2 id="bd-name" style="font-size: 20px; margin-bottom: 5px;">Juan Dela Cruz</h2>
+                <div class="details-label">Total Outstanding Balance</div>
+                <div class="details-balance" id="bd-balance">₱0.00</div>
+            </div>
+
+            <!-- Add Loan Button (Always Visible) -->
+            <button class="btn-block btn-primary" style="margin-bottom:20px;" onclick="app.prepareTransaction('disbursement')">
+                <i class="ph-bold ph-plus-circle"></i> NEW LOAN
+            </button>
+
+            <div class="history-section">
+                <h4>Active Loans</h4>
+                <div id="bd-loan-list" style="max-height: 400px; overflow-y: auto;">
+                    <!-- Dynamic Loan Cards -->
+                </div>
+            </div>
+
+            <div style="flex:1"></div>
+            <button class="btn-block btn-primary" style="background: linear-gradient(135deg, #a78bfa, #818cf8); margin-bottom: 10px;" onclick="app.editBorrower()">EDIT PROFILE</button>
+            <button class="btn-block btn-danger" style="margin-bottom:10px; background:#ef4444;" onclick="app.deleteBorrower()">DELETE PROFILE</button>
+            <button class="btn-block btn-cancel" onclick="app.toggleModal('modal-borrower-details', false)">CLOSE</button>
+        </div>
+    </div>
+
+    <!-- === MODAL: TRANSACTION INPUT === -->
+    <div id="modal-transact" class="modal-overlay" style="z-index: 210;">
+        <div class="modal-sheet" style="height: auto;">
+            <h2 id="transact-title" style="margin-bottom: 20px;">Record Transaction</h2>
+            <div class="form-group">
+                <label>Amount (₱)</label>
+                <input type="number" id="transact-amount" placeholder="0.00" style="font-size: 24px; text-align: center;">
+            </div>
+            <button class="btn-block btn-primary" onclick="app.executeTransaction()">CONFIRM</button>
+            <button class="btn-block btn-cancel" onclick="app.toggleModal('modal-transact', false)">CANCEL</button>
+        </div>
+    </div>
+
+    <!-- === MODAL: RECEIPT (NEW) === -->
+    <div id="modal-receipt" class="modal-overlay" style="z-index: 220;">
+        <div class="modal-sheet" style="height: auto; background: transparent; box-shadow: none;">
+            <div class="receipt-paper">
+                <h3 style="color:var(--primary); margin-bottom: 5px;">PAYMENT SUCCESSFUL</h3>
+                <p style="font-size:11px; color:gray; margin-bottom:20px;">TRANSACTION RECEIPT</p>
+                
+                <div class="receipt-amount" id="rcpt-amount">₱0.00</div>
+                
+                <div class="receipt-row"><span>Date</span><span id="rcpt-date">--</span></div>
+                <div class="receipt-row"><span>Time</span><span id="rcpt-time">--</span></div>
+                <div class="receipt-row"><span>Payer</span><span id="rcpt-name">--</span></div>
+                <div class="receipt-row"><span>Reference</span><span id="rcpt-ref">--</span></div>
+                <hr style="border-top:1px dashed #e2e8f0; margin: 15px 0;">
+                <div class="receipt-row"><span>Remaining Balance</span><span id="rcpt-bal" style="color:var(--danger)">--</span></div>
+                
+                <button class="btn-block btn-primary" style="margin-top:20px;" onclick="app.toggleModal('modal-receipt', false)">CLOSE RECEIPT</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- === MODAL: CALCULATOR === -->
+    <div id="modal-calc" class="modal-overlay">
+        <div class="modal-sheet" style="height:auto;">
+            <h2 style="font-size:22px; font-weight:800; margin-bottom:20px;">Interest Calculator</h2>
+            <div class="form-group"><label>Principal</label><input type="number" id="calc-p"></div>
+            <div class="form-group"><label>Rate (%)</label><input type="number" id="calc-r"></div>
+            <div class="form-group"><label>Days</label><input type="number" id="calc-d"></div>
+            <div style="background:#f1f5f9; border-radius:16px; padding:20px; margin:10px 0;">
+                <div class="calc-result-row"><span class="calc-label">Interest</span><span class="calc-value" id="calc-result-interest">₱0.00</span></div>
+                <div class="calc-result-row" style="border:none;"><span class="calc-label">Total</span><span class="calc-value calc-total" id="calc-result-total">₱0.00</span></div>
+            </div>
+            <button class="btn-block btn-primary" onclick="app.runCalculator()">CALCULATE</button>
+            <button class="btn-block btn-cancel" onclick="app.toggleModal('modal-calc', false)">CLOSE</button>
+        </div>
+    </div>
+
+    <!-- === MODAL: TUTORIAL === -->
+    <div id="modal-tutorial" class="modal-overlay">
+        <div class="modal-sheet">
+            <h2 style="font-size:20px; font-weight:800; margin-bottom:20px;">User Manual</h2>
+            <div class="tutorial-step"><h4>1. How to Create a New Loan</h4><p>Go to Home, tap (+). Enter details including Interest Rate. Each loan is tracked separately.</p></div>
+            <div class="tutorial-step"><h4>2. How to Pay</h4><p>Tap a Borrower. You will see a list of loans. Click the "PAY" button specific to the loan you want to pay.</p></div>
+            <div class="tutorial-step"><h4>3. Penalty Logic</h4><p>If a loan passes its due date, the penalty rate is automatically added to the Total Due.</p></div>
+            <div class="tutorial-step" style="border-bottom:none;"><h4>4. SAFETY</h4><p>Use Tools > Save to Storage to backup your data daily.</p></div>
+            <button class="btn-block btn-primary" onclick="app.toggleModal('modal-tutorial', false)">CLOSE MANUAL</button>
+        </div>
+    </div>
+
+    <!-- TOAST ELEMENT -->
+    <div id="toast" class="toast">Data Saved. Backup Recommended.</div>
 
     <script src="script.js"></script>
 </body>
-                                                                           </html>
-                                                                 
+    </html>
+    
